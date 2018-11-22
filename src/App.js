@@ -1,25 +1,27 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import ListLibrary from './ListLibrary'
+import './App.css'
+import * as BooksAPI from './BooksAPI.js'
 
 class App extends Component {
+
+  state= {
+    books: []
+  }
+
+  componentDidMount() {
+    BooksAPI.getAll().then( books => {
+      this.setState({ books })
+    })
+  }
+
+
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <ListLibrary libraryName="currentlyReading" books={this.state.books}/>
+        <ListLibrary libraryName="read" books={this.state.books}/>
+        <ListLibrary libraryName="wantToRead" books={this.state.books}/>
       </div>
     );
   }
