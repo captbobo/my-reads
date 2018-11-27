@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import ListShelf from './ListShelf'
+import ListShelves from './ListShelves'
+import BookCard from './BookCard'
 import './App.css'
 import * as BooksAPI from './BooksAPI.js'
 
@@ -7,31 +8,32 @@ class App extends Component {
 
   state= {
     books: [],
-    shelves: []
+    // shelves: [] // raw names of the shelves inside
   }
 
   componentDidMount() {
     BooksAPI.getAll().then( books => {
       this.setState({ books })
-    }).then(() => (
-      this.findShelves()
-    ))
-  }
+    })
 
-  findShelves() {
-    let shelves = Array.from(this.state.books.map((book) => (book.shelf)))
-    shelves = [...new Set(shelves)]
-    this.setState({ shelves : shelves })
+    /*
+      .then(() => (
+      this.setShelves()
+    ))
+    */
   }
 
   render() {
-    const {books, shelves} = this.state
+    const { books } = this.state
+
     return (
       <div className="App">
-        <div className="shelf-header"><h1>ireads</h1></div>
-        {shelves.map((shelf) => (
-          <ListShelf shelfName={shelf} books={books}/>
-        ))} 
+        <div className="shelf-header">
+          <h1>ireads</h1>
+        </div>
+          <ListShelves items={books}>
+            {books.map( book => ( <BookCard key={book.id} book={book} />))}
+          </ListShelves>
       </div>
     );
   }

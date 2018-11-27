@@ -3,17 +3,31 @@
 
   class BookCard extends Component {
 
+    state = { shelf: '' }
+
+    handleChange = (event) => {
+      this.setState({ shelf:event.target.value })
+    }
+
     render() {
-      const { book } = this.props
+      const { book, shelves } = this.props
 
       return (
-      <div className="book">
-        <div className="book-shelf-changer-container">
-          <select className="book-shelf-changer"></select>
-          {console.log(book)}
-        </div>
-        <img
-          className="book-cover"
+        <div className="book">
+        { //<div className="book-top">
+        }
+          <select id="shelf-select"
+                className="book-shelf-changer"
+                aria-label="Choose a shelf:">
+            <option defaultValue={ book.shelf }>{ book.shelf }</option>
+            { shelves.filter( s => s !== book.shelf ).map( s => (
+              <option key={s} value={ s }>{ s }></option>)
+              )
+            }
+          </select>
+        { //</div>
+        }
+        <img className="book-cover"
           src={book.imageLinks.smallThumbnail}
           alt={book.description}
           />

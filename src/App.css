@@ -140,6 +140,7 @@ button:active {
 
 .book {
   width: 7em;
+  position: relative;
 }
 
 .book-title,
@@ -166,14 +167,10 @@ button:active {
   align-items: flex-end;
 }
 
-.book-shelf-changer-container {
-  position: absolute;
-}
-
 .book-shelf-changer {
   position: relative;
-  right: -120px;
-  bottom: 18px;
+  right: -20px;
+  bottom: 20px;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -200,6 +197,7 @@ button:active {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   background: #eee;
   width: 100%;
+  min-height: 200px ;
 }
 
 .book-cover-title {
