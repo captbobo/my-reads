@@ -1,17 +1,7 @@
 import React, { Component } from 'react'
 import BookCard from './BookCard'
 
-// function SortBooks(props){
-//   const { books, shelf } = props
-//   let sortedBooks
-//   console.log(props)
-//   books && (sortedBooks = books.filter( book => book.shelf === shelf ))
-//   sortedBooks = sortedBooks.map(book => (<BookCard key={book.id} item={book}></BookCard>))
-// }
-//
-
-//
-
+// function
 
 const ShelfName = (props) => {
   return (
@@ -26,27 +16,24 @@ class ListShelves extends Component {
     query: ''
   }
 
-  // returns an array composed of unique shelf names
-  setUniqueShelves = (books) => {
-    let shelves, uniqueShelves
-    shelves = Array.from(books.map( book => book.shelf ))
-    uniqueShelves = [...new Set(shelves)]
-    return uniqueShelves
+  // turns shelf names from raw to reader friendly
+  readyShelfNamesForPrint = (shelf) => {
+    switch (shelf) {
+      case 'currentlyReading': return "Currently Reading"
+      case 'wantToRead': return "Want to Read"
+      case 'read': return "Read"
+      default: return "Bad Shelf Name"
+    }
   }
 
-  // turns shelf names from raw to reader friendly
-
-
   render() {
-    const { items } = this.props
+    const { children, shelf } = this.props
     return (
       <div className="bookshelf">
-        { this.setUniqueShelves(items).map((shelf) => (
-          <ShelfName value={ this.readyShelfNamesForPrint(shelf) }/>
-        ))}
+        <ShelfName value={ this.readyShelfNamesForPrint(shelf) }/>
         <div className="shelf-content">
           <ol className="books-grid">
-
+          {children}
           </ol>
         </div>
       </div>

@@ -8,19 +8,26 @@ class App extends Component {
 
   state= {
     books: [],
-    // shelves: [] // raw names of the shelves inside
   }
 
   componentDidMount() {
     BooksAPI.getAll().then( books => {
       this.setState({ books })
     })
+  }
 
-    /*
-      .then(() => (
-      this.setShelves()
-    ))
-    */
+  // returns an array composed of unique shelf names
+  setUniqueShelves = (books) => {
+    let shelves, uniqueShelves
+    shelves = Array.from(books.map( book => book.shelf ))
+    uniqueShelves = [...new Set(shelves)]
+    return uniqueShelves
+  }
+
+  sortBooks= (items, shelf) => {
+    let sortedBooks
+    items && (sortedBooks = items.filter( book => book.shelf === shelf ))
+    return sortedBooks
   }
 
   render() {
@@ -31,11 +38,16 @@ class App extends Component {
         <div className="shelf-header">
           <h1>ireads</h1>
         </div>
-          <ListShelves items={books}>
-            {books.map( book => ( <BookCard key={book.id} book={book} />))}
+        {this.setUniqueShelves(books).map( shelf => (
+          <ListShelves key={shelf}
+                       shelf={shelf}>
+            {this.sortBooks(books, shelf).map( book => (
+              <BookCard key={book.id} book={book}/>
+            ))}
           </ListShelves>
+        ))}
       </div>
-    );
+    )
   }
 }
 

@@ -1,32 +1,23 @@
-  import React, { Component } from 'react'
+import React, { Component } from 'react'
 
+class BookCard extends Component {
 
-  class BookCard extends Component {
+  state = { shelf: '' }
 
-    state = { shelf: '' }
+  handleChange = (event) => {
+    this.setState({ shelf:event.target.value })
+  }
 
-    handleChange = (event) => {
-      this.setState({ shelf:event.target.value })
-    }
+  render() {
+    const { book } = this.props
 
-    render() {
-      const { book, shelves } = this.props
-
-      return (
-        <div className="book">
-        { //<div className="book-top">
-        }
-          <select id="shelf-select"
-                className="book-shelf-changer"
-                aria-label="Choose a shelf:">
-            <option defaultValue={ book.shelf }>{ book.shelf }</option>
-            { shelves.filter( s => s !== book.shelf ).map( s => (
-              <option key={s} value={ s }>{ s }></option>)
-              )
-            }
-          </select>
-        { //</div>
-        }
+    return (
+      <div className="book">
+        <select id="shelf-select"
+              className="book-shelf-changer"
+              aria-label="Choose a shelf:">
+          <option defaultValue={ book.shelf }>{ book.shelf }</option>
+        </select>
         <img className="book-cover"
           src={book.imageLinks.smallThumbnail}
           alt={book.description}
