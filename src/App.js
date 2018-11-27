@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import ListShelves from './ListShelves'
+import ListShelf from './ListShelf'
 import BookCard from './BookCard'
 import './App.css'
 import * as BooksAPI from './BooksAPI.js'
@@ -16,10 +16,9 @@ class App extends Component {
     })
   }
 
-  // returns an array composed of unique shelf names
-  setUniqueShelves = (books) => {
+  getUniqueShelves = () => {
     let shelves, uniqueShelves
-    shelves = Array.from(books.map( book => book.shelf ))
+    shelves = Array.from(this.state.books.map( book => book.shelf ))
     uniqueShelves = [...new Set(shelves)]
     return uniqueShelves
   }
@@ -30,6 +29,28 @@ class App extends Component {
     return sortedBooks
   }
 
+  // turns shelf names from raw to reader friendly
+  readyShelfNamesForPrint = (shelf) => {
+    switch (shelf) {
+      case 'currentlyReading': return "Currently Reading"
+      case 'wantToRead': return "Want to Read"
+      case 'read': return "Read"
+      default: return "Bad Shelf Name"
+    }
+  }
+
+  changeShelf = (book, newShelf) => {
+    this.setState( state => ({
+      books: this.state.books.map( b => {
+        if(b.id === book.id){
+          b.shelf = newShelf
+          return b
+        }
+        else return b
+      })
+    }))
+  }
+
   render() {
     const { books } = this.state
 
@@ -38,17 +59,35 @@ class App extends Component {
         <div className="shelf-header">
           <h1>ireads</h1>
         </div>
-        {this.setUniqueShelves(books).map( shelf => (
-          <ListShelves key={shelf}
-                       shelf={shelf}>
+        {this.getUniqueShelves().map( shelf => (
+          <ListShelf key={shelf}
+                     shelf={ this.readyShelfNamesForPrint(shelf) }>
             {this.sortBooks(books, shelf).map( book => (
-              <BookCard key={book.id} book={book}/>
+              <BookCard key={book.id} book={book}>
+                <SelectShelf shelf={shelf}
+                             shelfList={this.getUniqueShelves()}
+                             moveBook={(newShelf) => this.changeShelf(book, newShelf)}
+                />
+              </BookCard>
             ))}
-          </ListShelves>
+          </ListShelf>
         ))}
       </div>
     )
   }
 }
+
+const SelectShelf = (props) => {
+  const shelf = props.shelf
+  return(
+    <select id="shelf-select"
+        aria-label="Choose a shelf:"
+        onChange={ event => props.moveBook(event.target.value) }>
+      <option defaultValue={shelf}>{shelf}</option>
+      {props.shelfList.filter( s => s !== shelf).map( s => (
+        <option key={s} value={s}>{s}</option>
+      ))}
+    </select>
+)}
 
 export default App;

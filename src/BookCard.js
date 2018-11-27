@@ -1,24 +1,16 @@
 import React, { Component } from 'react'
 
+
 class BookCard extends Component {
 
-  state = { shelf: '' }
-
-  handleChange = (event) => {
-    this.setState({ shelf:event.target.value })
-  }
-
   render() {
-    const { book } = this.props
+    const { children, book } = this.props
 
     return (
       <li>
         <div className="book">
           <div className="book-shelf-changer">
-            <select id="shelf-select"
-                  aria-label="Choose a shelf:">
-              <option defaultValue={ book.shelf }>{ book.shelf }</option>
-            </select>
+            {children}
           </div>
           <img className="book-cover"
             src={book.imageLinks.smallThumbnail}
