@@ -25,7 +25,7 @@ body, .app {
 }
 
 .list-books-content {
-  padding: 0 0 80px;
+  /* padding: 0 0 10px; */
   flex: 1;
 }
 
@@ -141,6 +141,7 @@ button:active {
 .book {
   width: 7em;
   position: relative;
+  top:-40px;
 }
 
 .book-title,
@@ -169,8 +170,8 @@ button:active {
 
 .book-shelf-changer {
   position: relative;
-  right: -20px;
-  bottom: 20px;
+  right: -120px;
+  bottom: -22px;
   width: 40px;
   height: 40px;
   border-radius: 50%;

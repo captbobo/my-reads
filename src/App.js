@@ -23,10 +23,10 @@ class App extends Component {
     uniqueShelves = [...new Set(shelves)]
     return uniqueShelves
   }
-
-  sortBooks= (items, shelf) => {
+  // returns books sorted for the shelf
+  sortBooks= (books, shelf) => {
     let sortedBooks
-    items && (sortedBooks = items.filter( book => book.shelf === shelf ))
+    books && (sortedBooks = books.filter( book => book.shelf === shelf ))
     return sortedBooks
   }
 

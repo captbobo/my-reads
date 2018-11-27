@@ -31,7 +31,7 @@ class ListShelves extends Component {
     return (
       <div className="bookshelf">
         <ShelfName value={ this.readyShelfNamesForPrint(shelf) }/>
-        <div className="shelf-content">
+        <div className="list-books-content">
           <ol className="books-grid">
           {children}
           </ol>
