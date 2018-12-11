@@ -30,14 +30,15 @@ export default class Search extends Component {
         <SearchBar query={query} onFormChange={this.searchQuery}/>
         {console.log(this.state)}
         <div className="search-books-results">
+          <ol className="books-grid">
           {results.error && results.length !== 0 ? <Sorry /> :
-            <ListBooksGrid> {results.map( book =>
+            results.map( book =>
               <Book book={book} key={book.id}
                   shelf={null}>
                 <Selector {...this.props}/>
-              </Book> }
-            </ListBooksGrid>
+              </Book>
             )}
+          </ol>
         </div>
       </div>
     )

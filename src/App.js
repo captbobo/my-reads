@@ -15,7 +15,7 @@ export const beautify = shelfName => {
     case 'Currently Reading': return "currentlyReading"
     case 'Want to Read': return "wantToRead"
     case 'Read': return "read"
-    default: return "Bad Shelf Name"
+    default: return ""
   }
 }
 
@@ -120,17 +120,26 @@ export const Book = props =>
       </div>
     </li>
 
-export const Selector = props =>
-  <div className="book-shelf-changer">
-    <select id="shelf-select"
-        aria-label="Choose a shelf:"
-        onChange={ event => props.moveBook( props.book , event.target.value) }>
-      <option disabled>Move to shelf:</option>
-      {props.shelf &&
-        <option defaultValue={ props.shelf ? props.shelf : "" }>{ beautify(props.shelf) }</option> }
-      {props.shelfNames.filter( s => s !== props.shelf ).map( s =>
-          <option key={s} value={s}>{beautify(s)}</option>
-        )}}
+export class Selector extends Component {
 
-    </select>
-  </div>
+  render(){
+    const {book, moveBook, shelf, shelfNames} = this.props
+    return (
+      <div className="book-shelf-changer">
+        <select id="shelf-select"
+        aria-label="Choose a shelf:"
+        onChange={ event => moveBook( book , event.target.value) }>
+          <option disabled>Move to shelf:</option>
+          { shelf ? <option defaultValue={ shelf ? shelf : " " }>{ beautify(shelf) }</option>
+                  : <option>Not in library</option> }
+          {shelfNames ?
+            shelfNames.filter( s => s !== shelf ).map( s =>
+              <option key={ s } value={ s }>{ beautify(s) }</option> )
+            : <option disabled>You have no shelves!</option>
+          }
+        </select>
+      </div>
+    )
+
+  }
+}
