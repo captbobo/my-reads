@@ -58,7 +58,7 @@ export default class App extends Component {
 
   render() {
     const { books } = this.state
-    const shelfNames = this.uniqueShelves()
+    const shelfNames = this.uniqueShelves().sort()
     const sharedProps = { books: books, shelfNames: this.uniqueShelves(), moveBook: this.handleShelfChange }
     return (
       <div className="app">
