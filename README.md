@@ -1,3 +1,9 @@
+Problem: app calls ListShelves.js on route "/search", (I have no idea why) and one of the props passed down to ListShelves by App becomes undefined. 
+
+
+
+
+---
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
