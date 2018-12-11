@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import {Book, Selector, beautify} from './App'
 
 
 const listBooks = Wrapped => {
