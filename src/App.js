@@ -111,7 +111,8 @@ export const Book = props =>
       <div className="book">
         {props.children}
         <img className="book-cover"
-          src={props.book.imageLinks.smallThumbnail}
+          src={props.book.imageLinks.smallThumbnail ?
+            props.book.imageLinks.smallThumbnail : "https://via.placeholder.com/150" }
           alt={props.book.description}
           />
         <p className="book-title">{props.book.title}</p>

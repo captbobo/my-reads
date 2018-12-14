@@ -13,31 +13,67 @@ export default class Search extends Component {
   }
 
   updateStateQuery = (query) => {
-    this.setState({ query: query.trim() })
+    this.setState({ query: query })
   }
 
   searchQuery = (query) => {
-    query &&
-      this.updateStateQuery(query)
-      BooksAPI.search(query).then( books => this.setState({ results: books }))
+    this.updateStateQuery(query)
+    // split words by space
+    let words = query.split(' ')
+    // remove multiple spaces if there are any
+    words = words.filter( word => word !== '' )
+    if (query !== ''){
+      // search each word
+      words.forEach( word => {
+        BooksAPI.search(word).then( response => {
+            response.error ? this.clearResults() : this.updateResults(response)
+        })
+      })
     }
+
+    // old version
+    // if (query !== ''){
+    //   BooksAPI.search(query).then( response => {
+    //     response.error ? this.clearResults() :
+    //       this.setState({ results: response })
+    //   })
+    // } else {
+    //   this.clearResults()
+    // }
+  }
+
+  updateResults = (resp) => {
+    let resultsArray = []
+    resp && resp.map( book => resultsArray.push(book))
+    const results = [...new Set(resultsArray)]
+    this.setState(state => state.results = results)
+
+  }
+  clearResults = () => {
+    this.setState({ results: [] })
+  }
 
   render(){
     const {query, results}= this.state
     // const {moveBook, shelfNames} = this.props
+    // let showingBooks = false
+    // results.length !== 0 && (showingBooks = results)
+
+    // (query === '' && results.length !== 0) ? clearResults() :
+
     return (
       <div className="search">
         <SearchBar query={query} onFormChange={this.searchQuery}/>
         {console.log(this.state)}
         <div className="search-books-results">
           <ol className="books-grid">
-          {results.error && results.length !== 0 ? <Sorry /> :
-            results.map( book =>
-              <Book book={book} key={book.id}
-                  shelf={null}>
-                <Selector {...this.props}/>
-              </Book>
-            )}
+          { query !== '' && results.length === 0 ? <Sorry /> :
+              results.map( book =>
+                <Book book={book} key={book.id} shelf={null}>
+                  <Selector book={book} {...this.props}/>
+                </Book>
+              )
+            }
           </ol>
         </div>
       </div>
