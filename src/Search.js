@@ -29,9 +29,10 @@ export default class Search extends Component {
             response.error ? this.clearResults() : this.updateResults(response)
         })
       })
-    }
+    } else this.clearResults()
 
     // old version
+
     // if (query !== ''){
     //   BooksAPI.search(query).then( response => {
     //     response.error ? this.clearResults() :
@@ -42,9 +43,13 @@ export default class Search extends Component {
     // }
   }
 
+  // I thought this step was needed to filter state.results since in some instances
+  // there are multiple items with the same book.id
+  // The problem here is that this function pushes results into the state
+  // (it is console.logged)
   updateResults = (resp) => {
     let resultsArray = []
-    resp && resp.map( book => resultsArray.push(book))
+    resp && resp.forEach( book => resultsArray.push(book))
     const results = [...new Set(resultsArray)]
     this.setState(state => state.results = results)
 
@@ -55,11 +60,6 @@ export default class Search extends Component {
 
   render(){
     const {query, results}= this.state
-    // const {moveBook, shelfNames} = this.props
-    // let showingBooks = false
-    // results.length !== 0 && (showingBooks = results)
-
-    // (query === '' && results.length !== 0) ? clearResults() :
 
     return (
       <div className="search">

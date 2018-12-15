@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {Book, Selector, beautify} from './App'
 
-
+// this file and its contents are not used in the app
 const listBooks = Wrapped => {
   return class Shelved extends Component {
     sortBooks= (shelf) => {

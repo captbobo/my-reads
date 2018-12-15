@@ -52,7 +52,7 @@ export default class App extends Component {
         return b
       })
     }))
-    BooksAPI.update(book, newShelf)
+    BooksAPI.update(book, newShelf).then(res => this.setState(s => s.books.push(res)))
   }
 
 
@@ -106,20 +106,32 @@ const ShelfHeader = props =>
     <h2 className="bookshelf-title">{props.name}</h2>
   </div>
 
-export const Book = props =>
-    <li>
-      <div className="book">
-        {props.children}
-        <img className="book-cover"
-          src={props.book.imageLinks.smallThumbnail ?
-            props.book.imageLinks.smallThumbnail : "https://via.placeholder.com/150" }
-          alt={props.book.description}
+export class Book extends Component {
+
+  componentDidMount() {
+    console.log(this.props)
+  }
+
+  render(){
+    const {children, book} = this.props
+    console.log(book)
+    return (
+      <li>
+        <div className="book">
+          {children}
+          <img className="book-cover"
+            src={book.imageLinks.smallThumbnail}
+            alt={book.description}
           />
-        <p className="book-title">{props.book.title}</p>
-        <p className="book-subtitle">{props.book.subtitle}</p>
-        <p className="book-authors">{props.book.authors}</p>
-      </div>
-    </li>
+        <p className="book-title">{book.title}</p>
+        <p className="book-subtitle">{book.subtitle}</p>
+        <p className="book-authors">{book.authors}</p>
+        </div>
+      </li>
+
+    )
+  }
+}
 
 export class Selector extends Component {
 
@@ -131,11 +143,11 @@ export class Selector extends Component {
         aria-label="Choose a shelf:"
         onChange={ event => moveBook( book , event.target.value) }>
           <option disabled>Move to shelf:</option>
-          { shelf ? <option defaultValue={ shelf ? shelf : " " }>{ beautify(shelf) }</option>
+          { shelf ? <option key={shelf} defaultValue={ shelf ? shelf : " " }>{ beautify(shelf) }</option>
                   : <option>Not in library</option> }
           {shelfNames ?
-            shelfNames.filter( s => s !== shelf ).map( s =>
-              <option key={ s } value={ s }>{ beautify(s) }</option> )
+            shelfNames.filter( s => s !== shelf ).map( (s, index) =>
+              <option key={ index } value={ s }>{ beautify(s) }</option> )
             : <option disabled>You have no shelves!</option>
           }
         </select>
