@@ -30,29 +30,19 @@ export default class Search extends Component {
         })
       })
     } else this.clearResults()
-
-    // old version
-
-    // if (query !== ''){
-    //   BooksAPI.search(query).then( response => {
-    //     response.error ? this.clearResults() :
-    //       this.setState({ results: response })
-    //   })
-    // } else {
-    //   this.clearResults()
-    // }
   }
 
-  // I thought this step was needed to filter state.results since in some instances
-  // there are multiple items with the same book.id
-  // The problem here is that this function pushes results into the state
-  // (it is console.logged)
   updateResults = (resp) => {
-    let resultsArray = []
-    resp && resp.forEach( book => resultsArray.push(book))
-    const results = [...new Set(resultsArray)]
-    this.setState(state => state.results = results)
-
+    //just push new results if no results at present
+    if(this.state.results.length === 0) {
+      this.setState({ results: [...resp] })
+    } else {
+      //
+      const resultsArray = [...this.state.results, ...resp]
+      // get only unique items
+      const results = [...new Set(resultsArray)]
+      this.setState(state => { state.results = [...results] })
+    }
   }
   clearResults = () => {
     this.setState({ results: [] })
@@ -60,7 +50,7 @@ export default class Search extends Component {
 
   render(){
     const {query, results}= this.state
-
+    console.log(this.state)
     return (
       <div className="search">
         <SearchBar query={query} onFormChange={this.searchQuery}/>
