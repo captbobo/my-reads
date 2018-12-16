@@ -52,7 +52,7 @@ export default class App extends Component {
         return b
       })
     }))
-    BooksAPI.update(book, newShelf).then(res => this.setState(s => s.books.push(res)))
+    BooksAPI.update(book, newShelf).then(res => this.setState(s => [...s.books, res]))
   }
 
 
@@ -108,15 +108,19 @@ const ShelfHeader = props =>
 
 export class Book extends Component {
 
+  fixThumbnail = (book) => {
+      let smallThumb = book.imageLinks.smallThumbnail
+      smallThumb ? smallThumb = book.imageLinks.smallThumbnail : smallThumb = "https://via.placeholder.com/150"
+    }
+
   componentDidMount() {
-    console.log(this.props)
+    this.fixThumbnail(this.props.book)
   }
 
   render(){
     const {children, book} = this.props
-    console.log(book)
     return (
-      <li>
+      <li key={book.id}>
         <div className="book">
           {children}
           <img className="book-cover"
