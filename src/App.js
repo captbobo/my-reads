@@ -52,9 +52,10 @@ export default class App extends Component {
         return b
       })
     }))
+    // app needs a refresh to show the newly
+    // added book after adding via search
     BooksAPI.update(book, newShelf).then(res => this.setState(s => [...s.books, res]))
   }
-
 
   render() {
     const { books } = this.state
@@ -70,8 +71,8 @@ export default class App extends Component {
               return (
                 <div key={shelf} className="bookshelf">
                   <ShelfHeader name={beautify(shelf)}/>
-                  <div className="list-books-content"> {// component ?
-                  } <ol className="books-grid">
+                  <div className="list-books-content">
+                    <ol className="books-grid">
                       {onShelf.map( book =>  // could this be achieved with a method instead? or a HOC?
                         <Book key={book.id} book={book}>
                           <Selector book={book}
@@ -89,7 +90,7 @@ export default class App extends Component {
             </Link>
           </div>
         }/>
-        <Route path="/search" render={()=> <Search books={books}{...sharedProps}/> }/>
+        <Route path="/search" render={()=> <Search books={books} {...sharedProps}/> }/>
       </div>
     )
   }

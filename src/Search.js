@@ -50,7 +50,6 @@ export default class Search extends Component {
         )
       )
       this.setState({ results: [...uniqueResults] })
-      console.log(this.state.results)
     }
   }
   clearResults = () => {
@@ -59,7 +58,6 @@ export default class Search extends Component {
 
   render(){
     const {query, results}= this.state
-    console.log(this.state)
     return (
       <div className="search">
         <SearchBar query={query} onFormChange={this.searchQuery}/>
