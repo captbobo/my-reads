@@ -33,15 +33,24 @@ export default class Search extends Component {
   }
 
   updateResults = (resp) => {
-    //just push new results if no results at present
+    //just push new results if its the first word of the query
+
     if(this.state.results.length === 0) {
+      // const uniqueRespIDs = [...new Set(resp.map(b => b.id))]
       this.setState({ results: [...resp] })
     } else {
-      //
+      // combined results of all queries by multiple words
       const resultsArray = [...this.state.results, ...resp]
-      // get only unique items
-      const results = [...new Set(resultsArray)]
-      this.setState(state => { state.results = [...results] })
+      // get unique book ids :
+      const uniqueIDs = [...new Set(resultsArray.map(b => b.id))]
+      // return filtered combined results of unique books
+      const uniqueResults = uniqueIDs.map( id =>
+        resultsArray.find( book =>
+          book.id === id
+        )
+      )
+      this.setState({ results: [...uniqueResults] })
+      console.log(this.state.results)
     }
   }
   clearResults = () => {
