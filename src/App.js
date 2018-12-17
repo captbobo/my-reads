@@ -59,7 +59,7 @@ export default class App extends Component {
   render() {
     const { books } = this.state
     const shelfNames = this.uniqueShelves().sort()
-    const sharedProps = { books: books, shelfNames: this.uniqueShelves(), moveBook: this.handleShelfChange }
+    const sharedProps = { shelfNames: this.uniqueShelves(), moveBook: this.handleShelfChange }
     return (
       <div className="app">
         <Route exact path="/" render={()=>
@@ -76,8 +76,7 @@ export default class App extends Component {
                         <Book key={book.id} book={book}>
                           <Selector book={book}
                                     shelf={shelf}
-                                    moveBook={this.handleShelfChange}
-                                    shelfNames={shelfNames}/>
+                                    {...sharedProps}/>
                         </Book>
                       )}
                     </ol>
@@ -90,7 +89,7 @@ export default class App extends Component {
             </Link>
           </div>
         }/>
-        <Route path="/search" render={()=> <Search {...sharedProps}/> }/>
+        <Route path="/search" render={()=> <Search books={books}{...sharedProps}/> }/>
       </div>
     )
   }
