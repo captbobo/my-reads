@@ -43,17 +43,7 @@ export default class App extends Component {
     uniqueShelves = [...new Set(shelves)]
     return uniqueShelves
   }
-
-  checkThumbnail = (books) => {
-    books.map( book => {
-      if (!book.imageLinks.smallThumbnail) {
-        book.imageLinks.smallThumbnail = "https://via.placeholder.com/150"
-        console.log("done")
-        return book
-      } else return book
-    })
-  }
-
+  
   handleShelfChange = (book, newShelf) => {
     this.setState( state => ({
       books: this.state.books.map( b => {
