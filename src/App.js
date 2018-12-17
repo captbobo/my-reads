@@ -44,6 +44,16 @@ export default class App extends Component {
     return uniqueShelves
   }
 
+  checkThumbnail = (books) => {
+    books.map( book => {
+      if (!book.imageLinks.smallThumbnail) {
+        book.imageLinks.smallThumbnail = "https://via.placeholder.com/150"
+        console.log("done")
+        return book
+      } else return book
+    })
+  }
+
   handleShelfChange = (book, newShelf) => {
     this.setState( state => ({
       books: this.state.books.map( b => {
@@ -109,13 +119,9 @@ const ShelfHeader = props =>
 export class Book extends Component {
 
   fixThumbnail = (book) => {
-      let smallThumb = book.imageLinks.smallThumbnail
-      smallThumb ? smallThumb = book.imageLinks.smallThumbnail : smallThumb = "https://via.placeholder.com/150"
+      return book.hasOwnProperty('imageLinks') ?
+        book.imageLinks.smallThumbnail : "https://via.placeholder.com/150"
     }
-
-  componentDidMount() {
-    this.fixThumbnail(this.props.book)
-  }
 
   render(){
     const {children, book} = this.props
@@ -124,7 +130,7 @@ export class Book extends Component {
         <div className="book">
           {children}
           <img className="book-cover"
-            src={book.imageLinks.smallThumbnail}
+            src={this.fixThumbnail(book)}
             alt={book.description}
           />
         <p className="book-title">{book.title}</p>
@@ -147,7 +153,7 @@ export class Selector extends Component {
         aria-label="Choose a shelf:"
         onChange={ event => moveBook( book , event.target.value) }>
           <option disabled>Move to shelf:</option>
-          { shelf ? <option key={shelf} defaultValue={ shelf ? shelf : " " }>{ beautify(shelf) }</option>
+          { shelf ? <option key={shelf} defaultValue={shelf}>{ beautify(shelf) }</option>
                   : <option>Not in library</option> }
           {shelfNames ?
             shelfNames.filter( s => s !== shelf ).map( (s, index) =>
