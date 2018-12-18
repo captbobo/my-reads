@@ -1,6 +1,8 @@
 iReads 
 ---
-### Search, add and organize books you have read, want to read and currently reading.
+_Search, add and organize books you have read, want to read and currently reading._
+
+---
 
 
 This practice-project, or assignment was: 
