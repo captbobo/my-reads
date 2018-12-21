@@ -3,9 +3,6 @@ import * as BooksAPI from './BooksAPI'
 import { Link } from 'react-router-dom'
 import {Book, Selector} from './App'
 
-// import escapeRegExp from 'escape-string-regexp'
-// import sortBy from 'sort-by'
-
 export default class Search extends Component {
   state={
     query: '',
@@ -22,7 +19,7 @@ export default class Search extends Component {
     this.splitQuery(query).map( word => BooksAPI.search( word )
       .then( this.checkPreviousResults )
       .then( this.removeDuplicates )
-      .then( this.merge)
+      .then( this.mergeBooks)
       .then( this.putResults )
       .catch( err => console.log("err: "+err))
     )
@@ -31,7 +28,6 @@ export default class Search extends Component {
   splitQuery = (query) => {
     let words = query.split(' ')
     words = words.filter( word => word !== '' ) // remove extra spaces if any
-    console.log(words)
     return words
   }
 
@@ -39,15 +35,11 @@ export default class Search extends Component {
       return this.state.results.length ? [...this.state.results, ...resp].filter( item => item ) : [...resp]
   }
 
-  // remove multiple instances of book objects
   removeDuplicates = (resp) => {
-      // find unique books and return them
       return [...new Set(resp.map(b => b.id))].map( id => resp.find( book => book.id === id ))
   }
 
-  // merge search response with books on shelf
-  // Books' shelf shown on search results if any
-  merge = (resp) => {
+  mergeBooks = (resp) => {
     console.log(resp)
     return resp.map( item => {
       let match = this.state.owned.find( myBook => myBook.id === item.id)
