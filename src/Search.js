@@ -12,62 +12,70 @@ export default class Search extends Component {
     results: []
   }
 
-  updateStateQuery = (query) => {
-    this.setState({ query: query })
+  runSearch = (query) => {
+    // this.clearResults()
+    this.search(query)
+    this.setState({ query: query, owned: this.props.books, results: [] })
   }
 
-  searchQuery = (query) => {
-    this.updateStateQuery(query)
-    // split words by space
+  search = (query) => {
+    this.splitQuery(query).map( word => BooksAPI.search( word )
+      .then( this.checkPreviousResults )
+      .then( this.removeDuplicates )
+      .then( this.merge)
+      .then( this.putResults )
+      .catch( err => console.log("err: "+err))
+    )
+  }
+
+  splitQuery = (query) => {
     let words = query.split(' ')
-    // remove multiple spaces if there are any
-    words = words.filter( word => word !== '' )
-    if (query !== ''){
-      // search each word
-      words.forEach( word => {
-        BooksAPI.search(word).then( response => {
-            response.error ? this.clearResults() : this.updateResults(response)
-        })
-      })
-    } else this.clearResults()
+    words = words.filter( word => word !== '' ) // remove extra spaces if any
+    console.log(words)
+    return words
   }
 
-  updateResults = (resp) => {
-    //just push new results if its the first word of the query
+  checkPreviousResults = (resp) => {
+      return this.state.results.length ? [...this.state.results, ...resp].filter( item => item ) : [...resp]
+  }
 
-    if(this.state.results.length === 0) {
-      // const uniqueRespIDs = [...new Set(resp.map(b => b.id))]
-      this.setState({ results: [...resp] })
-    } else {
-      // combined results of all queries by multiple words
-      const resultsArray = [...this.state.results, ...resp]
-      // get unique book ids :
-      const uniqueIDs = [...new Set(resultsArray.map(b => b.id))]
-      // return filtered combined results of unique books
-      const uniqueResults = uniqueIDs.map( id =>
-        resultsArray.find( book =>
-          book.id === id
-        )
-      )
-      this.setState({ results: [...uniqueResults] })
-    }
+  // remove multiple instances of book objects
+  removeDuplicates = (resp) => {
+      // find unique books and return them
+      return [...new Set(resp.map(b => b.id))].map( id => resp.find( book => book.id === id ))
   }
-  clearResults = () => {
-    this.setState({ results: [] })
+
+  // merge search response with books on shelf
+  // Books' shelf shown on search results if any
+  merge = (resp) => {
+    console.log(resp)
+    return resp.map( item => {
+      let match = this.state.owned.find( myBook => myBook.id === item.id)
+      return match ? match : item
+    })
   }
+
+  putResults = (results = []) => {
+    console.log(results)
+    this.setState({ results: results })
+  }
+
+  // clearResults = () => {
+  //   this.setState(state =>  state.results = [] )
+  // }
 
   render(){
     const {query, results}= this.state
     return (
       <div className="search">
-        <SearchBar query={query} onFormChange={this.searchQuery}/>
+        <SearchBar query={query} onFormChange={this.runSearch}/>
         {console.log(this.state)}
         <div className="search-books-results">
           <ol className="books-grid">
           { query !== '' && results.length === 0 ? <Sorry /> :
               results.map( book =>
                 <Book book={book} key={book.id} shelf={null}>
-                  <Selector book={book} {...this.props}/>
+                  <Selector book={book} shelf={book.shelf} {...this.props}/>
                 </Book>
               )
             }
