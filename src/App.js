@@ -43,7 +43,7 @@ export default class App extends Component {
     uniqueShelves = [...new Set(shelves)]
     return uniqueShelves
   }
-  
+
   handleShelfChange = (book, newShelf) => {
     this.setState( state => ({
       books: this.state.books.map( b => {
@@ -90,7 +90,7 @@ export default class App extends Component {
             </Link>
           </div>
         }/>
-        <Route path="/search" render={()=> <Search books={books} {...sharedProps}/> }/>
+        <Route path="/search" render={()=> <Search books={ books } {...sharedProps}/> }/>
       </div>
     )
   }

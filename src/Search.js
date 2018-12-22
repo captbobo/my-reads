@@ -19,9 +19,14 @@ export default class Search extends Component {
   }
 
   runSearch = (query) => {
-    this.clearState()
-    this.search(query)
-    this.setState({query: query})
+    this.loading(true)
+    if(query.length === 0) this.clearState()
+    else {
+      this.setState({ query: query })
+      this.search(this.state.query)
+    }
+    // this.clearState()
+    // this.loading(false)
   }
 
   search = (query) => {
@@ -32,8 +37,7 @@ export default class Search extends Component {
       .then( this.putResults )
       .catch( err => {
         console.log("err: "+err)
-        this.putResults()
-        this.clearState()
+        this.loading(false)
       })
     )
   }
@@ -61,6 +65,7 @@ export default class Search extends Component {
 
   putResults = (results = []) => {
     this.setState({ results: results })
+    this.loading(false)
   }
 
   clearState = () => {
@@ -71,21 +76,19 @@ export default class Search extends Component {
   }
 
   render(){
-    const { query, results }= this.state
+    const { query }= this.state
     //
     // const he = new Promise(function(resolve, reject) {
     //
     // });
+    if(query.length === 0 && this.state.results.length > 0) this.clearState()
     return (
       <div className="search">
         <SearchBar query={query} onFormChange={this.runSearch}/>
         {console.log(this.state)}
         <div className="search-books-results">
           <ol className="books-grid">
-          { !results.length && !this.state.loading ?
-              <Sorry state={this.state}/> :
-              <Results state={this.state}/>
-          }
+            <SearchResults state={this.state} />
           </ol>
         </div>
       </div>
@@ -93,11 +96,20 @@ export default class Search extends Component {
   }
 }
 
+const SearchResults = props => {
+  const { query, results, loading }= props.state
+
+  if (loading) return <div>Loading...</div>
+  else if (query !== '' && results.length === 0) {
+    return <div>Sorry, no books found with {query}!</div>
+  } else return <Results state={props.state} />
+}
+
 const Sorry = props => {
   if(props.state.query !== '' && !props.state.loading) {
     return <div>Sorry, no books found with that search query!</div>
-  }
-  return <div></div>
+  } else if (props.state.loading) return <div>Loading</div>
+  else return <div></div>
 }
 
 const Results = props => {
