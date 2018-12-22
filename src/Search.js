@@ -4,24 +4,37 @@ import { Link } from 'react-router-dom'
 import {Book, Selector} from './App'
 
 export default class Search extends Component {
+  initialState={
+    query: '',
+    results: [],
+    owned: this.props.books,
+    loading: false
+  }
+
   state={
     query: '',
-    results: []
+    results: [],
+    owned: this.props.books,
+    loading: false
   }
 
   runSearch = (query) => {
-    // this.clearResults()
+    this.clearState()
     this.search(query)
-    this.setState({ query: query, owned: this.props.books, results: [] })
+    this.setState({query: query})
   }
 
   search = (query) => {
     this.splitQuery(query).map( word => BooksAPI.search( word )
       .then( this.checkPreviousResults )
       .then( this.removeDuplicates )
-      .then( this.mergeBooks)
+      .then( this.mergeBooks )
       .then( this.putResults )
-      .catch( err => console.log("err: "+err))
+      .catch( err => {
+        console.log("err: "+err)
+        this.putResults()
+        this.clearState()
+      })
     )
   }
 
@@ -40,7 +53,6 @@ export default class Search extends Component {
   }
 
   mergeBooks = (resp) => {
-    console.log(resp)
     return resp.map( item => {
       let match = this.state.owned.find( myBook => myBook.id === item.id)
       return match ? match : item
@@ -48,29 +60,32 @@ export default class Search extends Component {
   }
 
   putResults = (results = []) => {
-    console.log(results)
     this.setState({ results: results })
   }
 
-  // clearResults = () => {
-  //   this.setState(state =>  state.results = [] )
-  // }
+  clearState = () => {
+    this.setState({...this.initialState })
+  }
+  loading = (value) => {
+    this.setState({ loading: value })
+  }
 
   render(){
-    const {query, results}= this.state
+    const { query, results }= this.state
+    //
+    // const he = new Promise(function(resolve, reject) {
+    //
+    // });
     return (
       <div className="search">
         <SearchBar query={query} onFormChange={this.runSearch}/>
         {console.log(this.state)}
         <div className="search-books-results">
           <ol className="books-grid">
-          { query !== '' && results.length === 0 ? <Sorry /> :
-              results.map( book =>
-                <Book book={book} key={book.id} shelf={null}>
-                  <Selector book={book} shelf={book.shelf} {...this.props}/>
-                </Book>
-              )
-            }
+          { !results.length && !this.state.loading ?
+              <Sorry state={this.state}/> :
+              <Results state={this.state}/>
+          }
           </ol>
         </div>
       </div>
@@ -78,8 +93,21 @@ export default class Search extends Component {
   }
 }
 
-const Sorry = props =>
-    <div>Sorry, no books found with that search query!</div>
+const Sorry = props => {
+  if(props.state.query !== '' && !props.state.loading) {
+    return <div>Sorry, no books found with that search query!</div>
+  }
+  return <div></div>
+}
+
+const Results = props => {
+    return props.state.results.map( book =>
+      <Book book={book} key={book.id} shelf={null}>
+        <Selector book={book} shelf={book.shelf} {...props}/>
+      </Book>
+    )
+}
+
 
 const SearchBar = props =>
   <div className="search-books-bar">
