@@ -1,58 +1,52 @@
 import React, { Component } from 'react'
 import * as BooksAPI from './BooksAPI'
 import { Link } from 'react-router-dom'
-import {Book, Selector} from './App'
+import { Selector } from './App'
+import { SearchResults } from './SearchResults'
+import Book from './Book'
 
 export default class Search extends Component {
   initialState={
     query: '',
     results: [],
-    owned: this.props.books,
+    owned: this.props.books, // why do I need this?
     loading: false
   }
-
+  // remove this and maybe
   state={
     query: '',
     results: [],
-    owned: this.props.books,
     loading: false
-  }
-
-  runSearch = (query) => {
-    this.loading(true)
-    if(query.length === 0) this.clearState()
-    else {
-      this.setState({ query: query })
-      this.search(this.state.query)
-    }
-    // this.clearState()
-    // this.loading(false)
-  }
-
-  search = (query) => {
-    this.splitQuery(query).map( word => BooksAPI.search( word )
-      .then( this.checkPreviousResults )
-      .then( this.removeDuplicates )
-      .then( this.mergeBooks )
-      .then( this.putResults )
-      .catch( err => {
-        console.log("err: "+err)
-        this.loading(false)
-      })
-    )
   }
 
   splitQuery = (query) => {
     let words = query.split(' ')
-    words = words.filter( word => word !== '' ) // remove extra spaces if any
+    words = words.filter( word => word !== '' ) // extra spaces from query
     return words
   }
 
-  checkPreviousResults = (resp) => {
-      return this.state.results.length ? [...this.state.results, ...resp].filter( item => item ) : [...resp]
+  // search = ( query = this.state.query ) => {
+  //   console.log(query)
+  //     this.splitQuery(query).map ( (word, index, words) =>
+  //         BooksAPI.search( word )
+  // .then( re => this.mergeResults( re, index ))
+  // .then( this.removeDuplicates, this.putResults() )
+  // .then( this.mergeBooks )
+  // .then( this.putResults )
+  // .catch( err => {
+    //     console.log("err: "+err)
+    //     this.putResults()
+    //   })
+
+  mergeResults = (resp, index) => {
+    // if this is the second word return combined results
+    return !index ? resp : [...this.state.results, ...resp] //.filter( item => item ) // filters undefined items
   }
 
   removeDuplicates = (resp) => {
+    // creates an array of unique book ids
+    // scans the response and gets first element with that id
+    // and returns that array, ultimately removing duplicates
       return [...new Set(resp.map(b => b.id))].map( id => resp.find( book => book.id === id ))
   }
 
@@ -63,74 +57,32 @@ export default class Search extends Component {
     })
   }
 
-  putResults = (results = []) => {
-    this.setState({ results: results })
-    this.loading(false)
+  putResults = (results = [], loading = false) => {
+    this.setState({ results: results, loading: loading })
   }
 
-  clearState = () => {
+  resetState = () => {
     this.setState({...this.initialState })
   }
-  loading = (value) => {
-    this.setState({ loading: value })
+
+
+  search = ( query = this.state.query ) => {
+    this.splitQuery(query).map ( (word, index, words) =>
+      BooksAPI.search( word )
+        .then( re => this.manageShowingBooks( re, index ))
+      )
+    }
+
+  manageShowingBooks = (re, index) => {
+    const showingBooks = this.mergeBooks(this.removeDuplicates(this.mergeResults(re, index)))
+    this.putResults(showingBooks)
   }
 
-  render(){
-    const { query }= this.state
-    //
-    // const he = new Promise(function(resolve, reject) {
-    //
-    // });
-    if(query.length === 0 && this.state.results.length > 0) this.clearState()
-    return (
-      <div className="search">
-        <SearchBar query={query} onFormChange={this.runSearch}/>
-        {console.log(this.state)}
-        <div className="search-books-results">
-          <ol className="books-grid">
-            <SearchResults state={this.state} />
-          </ol>
-        </div>
-      </div>
-    )
-  }
-}
-
-const SearchResults = props => {
-  const { query, results, loading }= props.state
-
-  if (loading) return <div>Loading...</div>
-  else if (query !== '' && results.length === 0) {
-    return <div>Sorry, no books found with {query}!</div>
-  } else return <Results state={props.state} />
-}
-
-const Sorry = props => {
-  if(props.state.query !== '' && !props.state.loading) {
-    return <div>Sorry, no books found with that search query!</div>
-  } else if (props.state.loading) return <div>Loading</div>
-  else return <div></div>
-}
-
-const Results = props => {
-    return props.state.results.map( book =>
-      <Book book={book} key={book.id} shelf={null}>
-        <Selector book={book} shelf={book.shelf} {...props}/>
-      </Book>
-    )
-}
-
-
-const SearchBar = props =>
-  <div className="search-books-bar">
-    <div className="search-books-input-wrapper">
-      <input
-        className='search-books'
-        type='text'
-        placeholder='Search books'
-        value={ props.query }
-        onChange={(event) => props.onFormChange(event.target.value)}
-      />
-      </div>
-    <Link to="/" className="close-search"/>
-  </div>
+//
+// const Sorry = props => {
+//   if(props.state.query !== '' && !props.state.loading) {
+//     return <div>Sorry, no books found with that search query!</div>
+//   }else if (props.state.loading) {
+//     return <div>Loading...</div>
+//   }else return <div></div>
+// }
