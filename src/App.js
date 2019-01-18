@@ -17,7 +17,7 @@ export const beautify = shelfName => {
     case 'Currently Reading': return "currentlyReading"
     case 'Want to Read': return "wantToRead"
     case 'Read': return "read"
-    default: return ""
+    default: return shelfName
   }
 }
 
@@ -33,6 +33,13 @@ export default class App extends Component {
     BooksAPI.getAll().then( books => {
       this.setState({ books })
     })
+  }
+  componentDidUpdate(nextProp, nextState) {
+    if (nextState.books === this.state.books) {
+      BooksAPI.getAll().then( books => {
+        this.setState({ books })
+      })
+    }
   }
   sortBooks= (shelf) => {
     const books = this.state.books
@@ -54,8 +61,7 @@ export default class App extends Component {
   }
 
   handleShelfChange = (book, newShelf) => {
-    // TODO: change algo
-    // this.state.results.map(book => if book findIndex? (one of) myBooks)
+
     this.setState( state => ({
       books: this.state.books.map( b => {
         if(b.id === book.id)
@@ -63,26 +69,16 @@ export default class App extends Component {
         return b
       })
     }))
-    // app needs a refresh to show the newly
-    // added book after adding via search
+
     BooksAPI.update(book, newShelf).then(res => this.setState(s => s.books = [...s.books, res]))
   }
 
-  // SEARCH FUNCTION
-
-  // search = ( query = this.state.query ) => {
-  //     BooksAPI.search( query ).then(re => {
-  //       console.log(re)
-  //       // this.setState({ results: re })
-  //     })
-  //   }
-
   search = ( query = this.state.query ) => {
     console.log(query)
-      this.splitQuery(query).map ( (word, index, words) =>
+      this.splitQuery(query).map(( word, index, words ) =>
           BooksAPI.search( word )
             .then( re => this.mergeResults( re, index ))
-            .then( this.removeDuplicates, this.putResults() )
+            .then( this.removeDuplicates )
             .then( this.mergeBooks )
             .then( this.putResults )
             .catch( err => {
@@ -91,15 +87,16 @@ export default class App extends Component {
                 })
       )
     }
-    splitQuery = (query) => {
-      let words = query.split(' ')
-      words = words.filter( word => word !== '' ) // extra spaces from query
-      return words
-    }
+
+  splitQuery = (query) => {
+    let words = query.split(' ')
+    words = words.filter( word => word !== '' ) // extra spaces from query
+    return words
+  }
 
   mergeResults = (resp, index) => {
     // if this is the second word return combined results
-    return !index ? resp : [...this.state.results, ...resp] //.filter( item => item ) // filters undefined items
+    return !index ? resp : [...this.state.results, ...resp] // filters undefined items
   }
 
   removeDuplicates = (resp) => {
@@ -110,9 +107,6 @@ export default class App extends Component {
   }
 
   mergeBooks = (resp) => {
-    // TODO:
-    // handleChange and this must merge
-
     return resp.map( item => {
       let match = this.state.books.find( myBook => myBook.id === item.id)
       return match ? match : item
@@ -131,7 +125,8 @@ export default class App extends Component {
   render() {
     const shelfNames = this.uniqueShelves().sort()
     const sharedProps = { shelfNames: this.uniqueShelves(), moveBook: this.handleShelfChange }
-    console.log(this.state)
+    console.log(this.state.results)
+    console.log(this.state.books)
     return (
       <div className="app">
       {
@@ -183,8 +178,10 @@ export default class App extends Component {
             <div className="search-books-results">
               <ol className="books-grid">
                 {this.state.results.map( book =>
-                  <Book book={book} key={book.id} shelf={null}>
-                    <Selector book={book} shelf={book.shelf} {...this.props}/>
+                  <Book book={book} key={book.id}>
+                    <Selector book={book}
+                              shelf={book.shelf}
+                              {...sharedProps}/>
                   </Book>)
                 }
               </ol>
